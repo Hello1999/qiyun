@@ -2,6 +2,19 @@
 
 Go standard-library implementation, with no shell execution endpoint or third-party Go modules. Build from this directory: `go build ./cmd/qiyun-agent`; tests: `go test ./...`. Production target is Linux; the other-platform stubs exist for development unit tests and do not offer privileged execution.
 
+## Release binaries
+
+[v0.1.0](https://github.com/Hello1999/qiyun/releases/tag/v0.1.0) includes Linux amd64 and arm64 binaries, so the target host does not need Go. For an amd64 host, download into a new working directory:
+
+```sh
+curl -fLO https://github.com/Hello1999/qiyun/releases/download/v0.1.0/qiyun-agent-linux-amd64
+curl -fLO https://github.com/Hello1999/qiyun/releases/download/v0.1.0/SHA256SUMS
+sha256sum --check --ignore-missing SHA256SUMS
+sudo install -o root -g root -m 0755 qiyun-agent-linux-amd64 /usr/local/bin/qiyun-agent
+```
+
+Use `qiyun-agent-linux-arm64` on arm64. Stop if checksum verification fails. The checksum verifies download integrity; this release does not provide an independent signing key or signature. The arm64 binary is cross-built but has not been run on arm64 hardware. Installing the executable does not enroll the host or grant helper permissions; complete the steps below.
+
 ## Process and permission boundary
 
 Run `qiyun-agent run --config /etc/qiyun/agent.json` as an ordinary dedicated user. It reads `/proc`, root-filesystem disk usage, and connects outbound to the HTTPS control gateway using its enrolled client certificate. CPU is a percentage between consecutive samples (first sample is `null`); memory and disk are percentages. Service CPU/memory are currently `null`, not fabricated zeroes. History is empty until the control plane accumulates it.
@@ -10,7 +23,7 @@ The optional root helper is a separate process: `qiyun-agent helper --config /et
 
 The helper requires root-owned configuration, signing public key, state directory and non-writable ancestor paths, and rejects symlinks on those paths. It verifies Unix `SO_PEERCRED` against the configured nonzero Agent UID, plus socket filesystem permissions. Assign `agentUid` and `agentGid` from the actual dedicated account; the example numbers are placeholders. The Agent must not be able to replace the helper binary, its config, signing key, state or socket directory. Install the executable root-owned and non-writable by that account.
 
-Examples and systemd templates are in `../deploy/agent/`. There is no published installer URL yet. Templates require an administrator to create the account, install the binary/configuration, provide a trusted CA and enroll before starting the services. Ensure `/etc/qiyun` is root-owned mode 0755, helper config/key are root-owned mode 0600, and the Agent's own state directory is owned by its dedicated user mode 0700. The helper's socket directory is root-owned and group-readable/traversable by the Agent's group. The helper template intentionally retains root privilege for the two registered backends; its policy is a scope boundary, not a general sandbox against a compromised helper or control-plane signing authority.
+Examples and systemd templates are in `../deploy/agent/`. Host Agent setup remains manual; the control-plane one-line installer is documented in `../docs/DEPLOYMENT.md`. Templates require an administrator to create the account, install the binary/configuration, provide a trusted CA and enroll before starting the services. Ensure `/etc/qiyun` is root-owned mode 0755, helper config/key are root-owned mode 0600, and the Agent's own state directory is owned by its dedicated user mode 0700. The helper's socket directory is root-owned and group-readable/traversable by the Agent's group. The helper template intentionally retains root privilege for the two registered backends; its policy is a scope boundary, not a general sandbox against a compromised helper or control-plane signing authority.
 
 ## Enrollment and initial trust
 

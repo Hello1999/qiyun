@@ -6,7 +6,7 @@
 
 准备一台可访问 GitHub 和 Docker 软件源的 Linux 服务器，以及 Bash、`curl` 和 `sudo` 权限。脚本默认将源码放在 `/opt/qiyun`，检查 Git、Docker Engine 和 Compose v2。支持的 Ubuntu / Debian 可补装 Git；Docker 完全未安装且没有冲突容器运行时包时，可通过官方 APT 软件源安装。已有 Docker 但缺少 Compose 时，按终端提示补齐插件，不替换现有 Engine。
 
-> 发布核验中：下面固定 `v0.1.0` 的公共命令须待该版本推送和下载核验完成后使用，当前不宣称已发行验证通过。
+固定版本 `v0.1.0`。公开源码下载、终端初始化与重复安装已通过 Ubuntu 24.04 / amd64 的 [GitHub 验收](https://github.com/Hello1999/qiyun/actions/runs/37187976534)。已是 root 用户时可去掉 `sudo`。
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/Hello1999/qiyun/v0.1.0/install.sh | sudo env QIYUN_REF=v0.1.0 bash

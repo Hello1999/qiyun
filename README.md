@@ -23,7 +23,7 @@
 
 在已有 `curl`、Bash 和 `sudo` 权限的 Linux 服务器终端执行。脚本默认安装到 `/opt/qiyun`，会检查 Git、Docker Engine 和 Compose v2；支持的 Ubuntu / Debian 可补装 Git，或在没有冲突容器运行时包的情况下从官方软件源安装缺失的 Docker。
 
-> 发布核验中：以下 `v0.1.0` 命令须在版本推送和公网下载核验完成后使用，当前不作为已发布安装入口。
+固定版本 `v0.1.0` 的公开源码安装与重复安装已在全新 Ubuntu 环境验收。已是 root 用户时可去掉命令中的 `sudo`。
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/Hello1999/qiyun/v0.1.0/install.sh | sudo env QIYUN_REF=v0.1.0 bash

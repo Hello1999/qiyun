@@ -1,6 +1,6 @@
 # 首版验收记录
 
-日期：2026-10-04。当前交付为本地可运行的 0.1.0 首版，不是已发布的生产发行包。
+日期：2026-10-04。当前交付为可部署的 0.1.0 首版；已完成公开源码安装验收，尚不宣称生产就绪。
 
 ## 通过的验证
 
@@ -15,7 +15,9 @@
 | Ark + Linux 全链路 | `QIYUN_TEST_ARK=1` 验收通过。真实模型读取单服务范围、调用重启提议工具，产生待确认计划；测试批准后由 Go helper 重启隔离容器；重复批准没有再次重启。该成功任务含 3 次模型请求，输入 2,810 / 输出 349 tokens |
 | 部署模板 | Linux `sh -n`、Compose 配置解析及端口覆盖通过；修复安装器构建上下文误指向仓库上级的问题 |
 | 控制端镜像 | `qiyun-control:0.1.0` 实际构建通过，冻结锁下载 150 个依赖成功。随机测试容器内 Node.js 24.19.0、UID 1000；session、HTML、JS 静态资源均返回 200，Docker 健康检查为 healthy。临时密码只经 stdin 完成管理员初始化，setupRequired 从 true 变为 false；测试容器及匿名数据卷已清理，镜像保留 |
-| GitHub CI | 公开仓库 `Hello1999/qiyun` 的基线提交 `fb7899e` 已通过 [Verify](https://github.com/Hello1999/qiyun/actions/runs/37186280531)，包括 Linux 上 Go race / vet / build、TypeScript 类型检查、测试和 Web / 控制端构建 |
+| GitHub CI | 公开仓库提交 `392dda9` 已通过 [Verify](https://github.com/Hello1999/qiyun/actions/runs/37187976534)，包括 Linux 上 Go race / vet / build、TypeScript 类型检查、测试和 Web / 控制端构建 |
+| 安装器保护条件 | 18 项 bootstrap 检查通过；部署 mock 覆盖首次初始化、秘密不进入参数/配置、重复安装、显式重建、同名项目拒绝和无 Key 安装。apt 分支使用 mock，不等于已在裸系统安装 Docker |
+| 公开源码完整安装 | GitHub 全新 Ubuntu 24.04 / amd64 runner，从公开固定提交下载并执行 curl 管道安装；真实 Docker 构建、三项终端输入和秘密隐藏、健康检查、管理员登录、模型 Key 文件读取、双端口回环绑定通过。再次运行保留配置、原 Key、管理员、数据卷和同一健康容器；安装目录与测试容器/卷已清理。未调用真实模型 |
 
 Linux 执行只针对本轮新建的随机命名 `qiyun-fixture-*` 容器；辅助进程白名单仅含该服务，测试结束已清理新建容器和镜像。测试使用缓存的 Alpine 镜像启动输出日志的休眠进程，不代表验证了 PostgreSQL 数据库重启或网站业务恢复。现有业务容器没有被重启。
 
@@ -23,7 +25,7 @@ Linux 执行只针对本轮新建的随机命名 `qiyun-fixture-*` 容器；辅�
 
 ## 尚未验证或实现
 
-- 目标 VPS 上的完整安装 / 升级、Ubuntu / Debian systemd 实机部署、arm64 实机运行。
+- 用户目标 VPS 上的安装 / 升级、裸系统自动安装 apt 依赖、Ubuntu / Debian systemd 实机部署、arm64 实机运行。
 - 真实麦克风转写、各浏览器兼容性、完整无障碍审计、200% 浏览器缩放和长时间稳定性。
 - 证书续期与吊销管理页、unknown 结果的人工核对 / 解锁流程、备份恢复、签名发行与升级失败恢复。
 - 主动 HTTP / TLS 检测、Compose 更新、配置 Git 历史与回滚、定时巡检和无人值守修复。

@@ -62,7 +62,7 @@ bash deploy/install.sh
 
 安装配置默认保存在源码目录下 `.local/control-install/deployment.env`，Key 位于相邻 `secrets/ark.key`。维护 Compose 时使用该配置及原项目名，避免意外创建新实例。控制端镜像和构建上下文不包含 `.local`、`.env`、Agent 私钥或用户运行数据。
 
-公开仓库 [Hello1999/qiyun](https://github.com/Hello1999/qiyun) 已建立并推送基础版本。`v0.1.0` 的公共安装入口仍在发行核验中；尚未提供签名发行包、无人值守自动升级或数据库自动回退。跨版本更新需要选择目标 Git 版本后，显式运行 `QIYUN_UPDATE=1 bash deploy/install.sh`。
+公开仓库 [Hello1999/qiyun](https://github.com/Hello1999/qiyun) 与 `v0.1.0` 固定版本安装入口已提供；公开源码首次安装与重复安装已在 GitHub 的全新 Ubuntu 24.04 环境验收。尚未提供签名发行包、无人值守自动升级或数据库自动回退。跨版本更新需要选择目标 Git 版本后，显式运行 `QIYUN_UPDATE=1 bash deploy/install.sh`。
 
 ## 接入 Linux 主机
 
