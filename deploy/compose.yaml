@@ -1,0 +1,26 @@
+name: qiyun
+services:
+  control:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${QIYUN_PORT:-4310}:4310"
+      - "${QIYUN_AGENT_PORT:-4311}:4311"
+    environment:
+      QIYUN_AGENT_URL: ${QIYUN_AGENT_URL:-https://localhost:${QIYUN_AGENT_PORT:-4311}}
+      QIYUN_AGENT_HOSTNAMES: ${QIYUN_AGENT_HOSTNAMES:-localhost}
+      QIYUN_ALLOWED_ORIGINS: ${QIYUN_ALLOWED_ORIGINS:-http://localhost:${QIYUN_PORT:-4310},http://127.0.0.1:${QIYUN_PORT:-4310}}
+      QIYUN_DEMO: ${QIYUN_DEMO:-true}
+      ARK_BASE_URL: https://ark.cn-beijing.volces.com/api/coding/v3
+      ARK_MODEL: deepseek-v4.1-flash
+      ARK_API_KEY: ${ARK_API_KEY:-}
+    volumes:
+      - control-data:/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+volumes:
+  control-data:

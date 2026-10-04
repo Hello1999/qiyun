@@ -4,9 +4,9 @@
 
 本项目暂名“栖云 Qiyun”，是面向 Linux 云服务器/VPS 的自托管 AI 运维工作台，优先 Docker、Compose 网站和已登记 systemd 服务。
 
-当前仓库处于项目定义阶段，尚无可运行产品。用户的最新请求决定工作范围；后续用户要求实现时直接推进对应工程，不需要因本文件再次确认阶段切换。不要将本轮规划误当作连接或操作任意真实服务器的授权。
+当前仓库处于首个可运行版本的实现与验证阶段，已有 Web、控制端、Go Agent/helper 和 Ark 适配器。演示数据、模拟测试、真实模型联调和 Linux 主机执行验收是不同层级，报告时必须区分。用户的最新请求决定工作范围，不需要因本文再次确认阶段切换；实现代码或调用模型的授权不自动包含操作任意真实生产主机。
 
-先阅读 README.md 和当前任务相关的 docs/PROJECT.md、docs/ARCHITECTURE.md、docs/DESIGN.md、docs/ARK-INTEGRATION.md。文档与用户新决定冲突时按新决定更新文档，不能固守旧方案。
+先阅读 README.md 和当前任务相关的 docs/PROJECT.md、docs/ARCHITECTURE.md、docs/DESIGN.md、docs/ARK-INTEGRATION.md、docs/DEPENDENCIES.md。文档与用户新决定冲突时按新决定更新文档，不能固守旧方案。
 
 ## 协作方式
 
@@ -35,11 +35,21 @@
 
 ## 结构与类型
 
-- 暂定 React/TypeScript Web、TypeScript 控制端、Go Agent，目录规划见架构文档。
+- 当前采用 React/TypeScript Web、Fastify/TypeScript 控制端、Go Agent 与独立 helper，目录见架构文档。
 - 使用 TypeScript strict、Go 显式错误处理；禁止用宽泛 any 隐藏接口问题。
 - 跨进程接口以版本化 JSON Schema 为契约，生成类型可辅助，运行时校验不可省略。
-- 依赖版本和 lockfile 入库；初始化时选择受支持版本，不假设本文锁定了具体版本。
+- 直接依赖使用精确版本，唯一依赖锁为 pnpm-lock.yaml；使用 package.json 指定的 pnpm 版本，不新增 npm/yarn 锁文件。升级后检查兼容性与依赖审计，不为得到零漏洞报告而忽略已知公告。
 - 第一版控制端为单实例 SQLite；新增分布式依赖先说明必要性。
+
+## 工程命令与运行环境
+
+- Node.js 最低版本以根 package.json 的 engines 为准；目前为 24.15+，验证使用 24.19.0。不要使用机器上可能残留的 Node 16 执行项目，也不擅自更改用户全局 Node 版本。
+- 安装：在仓库根目录执行 `pnpm install --frozen-lockfile`。仅变更依赖时重新生成锁文件；没有依赖变化时不反复安装。
+- 开发：`pnpm dev`；类型检查：`pnpm typecheck`；模拟与协议测试：`pnpm test`；生产构建：`pnpm build`；运行构建产物：`pnpm start`。
+- Go 测试在 `agent/` 内执行 `go test ./...`。Windows 上的测试、交叉编译不能替代 Linux 上 Docker/systemd 的实际运维验收。
+- 控制端使用 esbuild 构建 server/bootstrap 两个入口，并内联共享 contracts；不要把仅开发环境可解析的 TypeScript 源文件路径遗留为生产运行时依赖。
+- 端口和数据目录通过现有环境配置调整。端口被其他应用占用时更换本项目配置，不终止用户的其他进程；前端代理、允许的 Origin 和 Agent URL 必须保持一致。
+- HTTP 首次管理员初始化只允许本机访问；容器或远程部署使用 bootstrap CLI，不通过放宽来源校验解决初始化问题。数据库、会话、证书和签名密钥均留在受保护的运行时目录。
 
 ## 执行边界
 
@@ -49,6 +59,7 @@
 - 审批绑定具体计划 hash、目标、参数、用户和有效期；执行前发生相关漂移就失效。
 - Agent 和本地 helper 再次校验；控制端和浏览器不持有 Docker socket。
 - helper 验证对端身份、任务签名、计划绑定、防重放和本机受保护白名单；mTLS 不替代授权，也不宣称能抵抗可信控制端完全失陷。
+- 配对 CSR 和 TLS 签名验证使用原生加密实现。当前 node-forge 仅用于解析和证书生成，禁止重新引入其受公告影响的验签路径；依赖风险及现有措施见 docs/DEPENDENCIES.md。
 - Docker socket/group 是高权限能力，不把“容器化”或“非 root 用户”当作充分隔离证据。
 - 固定 argv 调用程序，拒绝 Shell 拼接；Compose 全文也需要策略检查，不能仅检查被修改字段。
 - Compose 审批绑定解析后的有效配置和环境/覆盖文件等依赖；使用固化输入，校验至应用持锁，漂移后重新生成计划。秘密不能因固化而进入 Git 或日志。
@@ -75,6 +86,7 @@
 - 支持键盘、焦点、对比度、窄屏、200% 缩放和 reduced-motion。
 - 语音转写可编辑，目标歧义必须消除，写操作仍走共同策略链。
 - 手动按钮与 AI 操作共用同一后端执行边界。
+- 演示会话的数据、任务和审批与真实会话隔离；演示不调用真实模型、不生成主机配对凭据，也不向真实 Agent 下发任务。
 
 ## 验证要求
 

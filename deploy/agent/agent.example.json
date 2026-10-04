@@ -1,0 +1,13 @@
+{
+  "hostId": "web-01",
+  "name": "Web 01",
+  "controlUrl": "https://control.example.com:4311",
+  "enrollmentUrl": "https://control.example.com:4311",
+  "caFile": "/var/lib/qiyun-agent/ca.pem",
+  "certificateFile": "/var/lib/qiyun-agent/client.pem",
+  "privateKeyFile": "/var/lib/qiyun-agent/client-key.pem",
+  "signingPublicKeyFile": "/var/lib/qiyun-agent/signing-public.pem",
+  "stateDir": "/var/lib/qiyun-agent",
+  "helperSocket": "/run/qiyun-helper/helper.sock",
+  "pollSeconds": 10
+}

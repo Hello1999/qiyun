@@ -1,0 +1,27 @@
+[Unit]
+Description=Qiyun privileged scoped service helper
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/local/bin/qiyun-agent helper --config /etc/qiyun/helper.json
+Restart=on-failure
+RestartSec=5
+StateDirectory=qiyun-helper
+StateDirectoryMode=0700
+RuntimeDirectory=qiyun-helper
+RuntimeDirectoryMode=0750
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX
+ReadWritePaths=/var/lib/qiyun-helper /run/qiyun-helper
+
+[Install]
+WantedBy=multi-user.target

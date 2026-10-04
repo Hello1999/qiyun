@@ -1,0 +1,29 @@
+[Unit]
+Description=Qiyun unprivileged host Agent
+After=network-online.target qiyun-helper.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=qiyun-agent
+Group=qiyun-agent
+ExecStart=/usr/local/bin/qiyun-agent run --config /etc/qiyun/agent.json
+Restart=on-failure
+RestartSec=5
+StateDirectory=qiyun-agent
+StateDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/qiyun-agent
+
+[Install]
+WantedBy=multi-user.target

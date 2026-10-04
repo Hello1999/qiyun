@@ -25,6 +25,7 @@ backups/
 
 # Build and dependency output
 node_modules/
+node_modules.interrupted-*/
 dist/
 build/
 coverage/
@@ -34,6 +35,8 @@ bin/
 tmp/
 playwright-report/
 test-results/
+agent/qiyun-agent
+agent/qiyun-agent.exe
 
 # Operating system files
 .DS_Store

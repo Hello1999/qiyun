@@ -1,0 +1,21 @@
+{
+  "name": "qiyun",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=24.15.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "pnpm --filter @qiyun/web build && pnpm --filter @qiyun/control build",
+    "start": "node --env-file-if-exists=.env apps/control/dist/server.js",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "test": "pnpm -r --if-present run test"
+  }
+}

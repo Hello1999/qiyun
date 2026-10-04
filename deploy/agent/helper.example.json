@@ -1,0 +1,15 @@
+{
+  "hostId": "web-01",
+  "name": "Web 01",
+  "stateDir": "/var/lib/qiyun-helper",
+  "helperSocket": "/run/qiyun-helper/helper.sock",
+  "signingPublicKeyFile": "/etc/qiyun/helper-signing-public.pem",
+  "agentUid": 995,
+  "agentGid": 995,
+  "dockerSocket": "/var/run/docker.sock",
+  "dockerContainers": [],
+  "discoverManaged": false,
+  "dockerRestartAllowlist": [],
+  "systemdUnits": [],
+  "systemdRestartAllowlist": []
+}
