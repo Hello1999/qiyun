@@ -1,6 +1,6 @@
 # 运行与接入
 
-本页描述第一版源码运行方式。产品设计目标见 PROJECT.md；真实验证记录见本轮交付报告。只有明确标记的演示环境使用样例数据。
+本页描述第一版源码开发与主机接入。Linux 控制端安装与升级见 [DEPLOYMENT.md](DEPLOYMENT.md)，产品范围见 [PROJECT.md](PROJECT.md)，实际验收见 [VERIFICATION.md](VERIFICATION.md)。只有明确标记的演示环境使用样例数据。
 
 ## 本地开发
 
@@ -23,7 +23,7 @@ Windows 使用 PowerShell 的 `Copy-Item .env.example .env`。如果 `node --ver
 
 ## 模型配置
 
-默认使用用户指定的 Coding Plan 地址与 DeepSeek 模型。在服务端 `.env` 配置：
+默认使用指定 Coding Plan 地址与 DeepSeek 模型。直接运行 Node.js / 本地开发时，在服务端 `.env` 配置：
 
 ```dotenv
 ARK_BASE_URL=https://ark.cn-beijing.volces.com/api/coding/v3
@@ -31,7 +31,9 @@ ARK_MODEL=deepseek-v4.1-flash
 ARK_API_KEY_FILE=/absolute/path/to/private/ark.key
 ```
 
-秘密文件只含 Key，Linux 权限设为 600；也可通过部署系统注入 `ARK_API_KEY` 环境变量。不要使用 `VITE_` 前缀，不要把 Key 放在 URL、Git 或命令行参数里。
+秘密文件只含 Key，Linux 权限设为 600，且运行控制端的用户可读；直接运行 Node.js 时也可注入 `ARK_API_KEY` 环境变量。不要使用 `VITE_` 前缀，不要把 Key 放在 URL、Git 或命令行参数里。
+
+通过 Linux 安装器部署时，Key 由隐藏输入或 `QIYUN_ARK_KEY_FILE` 提供，保存在安装状态目录，单文件只读挂载到控制端；容器经 `ARK_API_KEY_FILE` 读取，不将 Key 值放入 Compose 环境变量。可用 `QIYUN_SKIP_ARK=1` 暂不配置，后续补入方式见[模型配置](DEPLOYMENT.md#3-配置模型与端口)。
 
 执行 `node --env-file-if-exists=.env --import tsx scripts/verify-ark.ts` 可完成有界、无主机副作用的真实接口检查。该检查使用标记为 fixture 的样例资源；它会消耗少量模型额度，最多四轮请求，不切换端点。
 
@@ -51,20 +53,16 @@ node --env-file-if-exists=.env apps/control/dist/server.js
 已经安装 Docker Engine、Compose v2，并已获取本项目完整源码的 Linux 主机，可以在仓库根目录执行一行命令启动控制端：
 
 ```sh
-sh deploy/install.sh
+bash deploy/install.sh
 ```
 
-这会从源码构建并启动控制端，不改动现有业务容器，也不自动安装主机 Agent。首次管理员初始化：
-
-```sh
-docker compose -f deploy/compose.yaml exec control node apps/control/dist/bootstrap.js
-```
+这会从源码构建并启动控制端，交互式读取 Ark Key、管理员名称和密码，并完成首次管理员初始化；已有管理员和非空 Key 保留。安装器不改动现有业务容器，也不自动安装主机 Agent。无交互安装使用秘密文件，完整变量与维护命令见 [DEPLOYMENT.md](DEPLOYMENT.md)。
 
 控制端 HTTP 端口只发布到本机。远程管理时先用 SSH 本地端口转发；正式公网访问应另行配置 HTTPS 反向代理和精确的 `QIYUN_ALLOWED_ORIGINS`。应用不默认信任任意转发头。
 
-Compose 中模型 Key 由运行环境的 `ARK_API_KEY` 注入。避免把包含真实凭据的 `docker compose config` 输出保存到日志。控制端镜像和构建上下文不包含 `.local`、`.env`、Agent 私钥或用户运行数据。
+安装配置默认保存在源码目录下 `.local/control-install/deployment.env`，Key 位于相邻 `secrets/ark.key`。维护 Compose 时使用该配置及原项目名，避免意外创建新实例。控制端镜像和构建上下文不包含 `.local`、`.env`、Agent 私钥或用户运行数据。
 
-目前没有公共 Git 远程地址或签名发行包，因此没有提供虚构的公网 curl 安装链接；源码安装不等于已完成签名发行、自动升级与数据库回退。
+公开仓库 [Hello1999/qiyun](https://github.com/Hello1999/qiyun) 已建立并推送基础版本。`v0.1.0` 的公共安装入口仍在发行核验中；尚未提供签名发行包、无人值守自动升级或数据库自动回退。跨版本更新需要选择目标 Git 版本后，显式运行 `QIYUN_UPDATE=1 bash deploy/install.sh`。
 
 ## 接入 Linux 主机
 
@@ -122,6 +120,6 @@ Linux 验收脚本 `node scripts/test-linux.mjs` 要求 Docker 和 `.local/artif
 
 ## 运行数据
 
-SQLite、会话、CA 私钥、签名密钥和任务记录位于 `QIYUN_DATA_DIR`（默认 `.local`）。备份时应使用 SQLite 一致性备份并保护私钥；Git 不能代替该备份。Compose 卸载默认不要加 `--volumes`，避免删除控制端数据。
+直接运行 Node.js 时，SQLite、会话、CA 私钥、签名密钥和任务记录位于 `QIYUN_DATA_DIR`（默认 `.local`）；Compose 部署时保存在项目数据卷的 `/data`，与安装状态目录中的配置 / Key 分开。备份时应使用 SQLite 一致性备份并保护私钥，同时保存安装配置；Git 不能代替该备份。停止或移除容器时保留数据卷，不使用 `--volumes` 删除运行数据。
 
 语音目前使用浏览器可用的 SpeechRecognition，转写后可修改再提交；部分浏览器不支持，识别服务的网络可用性也受浏览器实现影响。独立 ASR 供应商适配尚未实现，不能把按钮存在视作所有浏览器语音均已验证。

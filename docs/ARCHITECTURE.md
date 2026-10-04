@@ -121,4 +121,4 @@ tests/                    验收辅助资源
 docs/                     产品、架构、设计、运行与验证记录
 ```
 
-代码与运行数据分别管理。当前尚未配置远程仓库或公共发行地址，不将本地提交写作已经发布。
+代码与运行数据分别管理。公开源码仓库为 [Hello1999/qiyun](https://github.com/Hello1999/qiyun)，Linux 安装入口及版本选择见 [DEPLOYMENT.md](DEPLOYMENT.md)；凭据和运行数据不随源码发布。

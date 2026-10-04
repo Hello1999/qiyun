@@ -5,6 +5,19 @@ on:
 permissions:
   contents: read
 jobs:
+  installer:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify isolated Linux installer behavior
+        run: >-
+          docker run --rm
+          -e QIYUN_INSTALLER_TEST_CONTAINER=1
+          -v "$PWD/install.sh:/src/install.sh:ro"
+          -v "$PWD/scripts/test-installer.mjs:/src/scripts/test-installer.mjs:ro"
+          -v "$PWD/deploy:/src/deploy:ro"
+          -w /src --entrypoint /bin/sh node:24.19.0-alpine
+          -c 'apk add --no-cache bash git coreutils >/tmp/qiyun-apk.log && bash -n install.sh && sh -n deploy/install.sh && node scripts/test-installer.mjs && sh deploy/test-install.sh'
   web-control:
     runs-on: ubuntu-24.04
     steps:

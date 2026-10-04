@@ -15,6 +15,7 @@
 | Ark + Linux 全链路 | `QIYUN_TEST_ARK=1` 验收通过。真实模型读取单服务范围、调用重启提议工具，产生待确认计划；测试批准后由 Go helper 重启隔离容器；重复批准没有再次重启。该成功任务含 3 次模型请求，输入 2,810 / 输出 349 tokens |
 | 部署模板 | Linux `sh -n`、Compose 配置解析及端口覆盖通过；修复安装器构建上下文误指向仓库上级的问题 |
 | 控制端镜像 | `qiyun-control:0.1.0` 实际构建通过，冻结锁下载 150 个依赖成功。随机测试容器内 Node.js 24.19.0、UID 1000；session、HTML、JS 静态资源均返回 200，Docker 健康检查为 healthy。临时密码只经 stdin 完成管理员初始化，setupRequired 从 true 变为 false；测试容器及匿名数据卷已清理，镜像保留 |
+| GitHub CI | 公开仓库 `Hello1999/qiyun` 的基线提交 `fb7899e` 已通过 [Verify](https://github.com/Hello1999/qiyun/actions/runs/37186280531)，包括 Linux 上 Go race / vet / build、TypeScript 类型检查、测试和 Web / 控制端构建 |
 
 Linux 执行只针对本轮新建的随机命名 `qiyun-fixture-*` 容器；辅助进程白名单仅含该服务，测试结束已清理新建容器和镜像。测试使用缓存的 Alpine 镜像启动输出日志的休眠进程，不代表验证了 PostgreSQL 数据库重启或网站业务恢复。现有业务容器没有被重启。
 
@@ -22,11 +23,11 @@ Linux 执行只针对本轮新建的随机命名 `qiyun-fixture-*` 容器；辅�
 
 ## 尚未验证或实现
 
-- 目标 VPS 上的完整安装 / 升级、Ubuntu / Debian systemd 实机部署、arm64 实机运行、Go race 检查及 GitHub Actions 云端执行。
+- 目标 VPS 上的完整安装 / 升级、Ubuntu / Debian systemd 实机部署、arm64 实机运行。
 - 真实麦克风转写、各浏览器兼容性、完整无障碍审计、200% 浏览器缩放和长时间稳定性。
 - 证书续期与吊销管理页、unknown 结果的人工核对 / 解锁流程、备份恢复、签名发行与升级失败恢复。
 - 主动 HTTP / TLS 检测、Compose 更新、配置 Git 历史与回滚、定时巡检和无人值守修复。
 
 依赖审计仍有 node-forge 上游高危公告。CSR 验签已使用原生 OpenSSL 路径；详情见 [DEPENDENCIES.md](DEPENDENCIES.md)，不能把上游未修复描述为零风险。
 
-本地运行数据、模型 Key、配对令牌、私钥和诊断文件均在 Git 排除范围。代码版本控制仅指本地 Git，尚无远程仓库或公共安装 URL。
+本地运行数据、模型 Key、配对令牌、私钥和诊断文件均在 Git 排除范围。代码已上传公开仓库 [Hello1999/qiyun](https://github.com/Hello1999/qiyun)，发布前对全部本地 Git 历史扫描，确认未包含用户提供的模型凭据。安装发行记录见 [DEPLOYMENT.md](DEPLOYMENT.md)。

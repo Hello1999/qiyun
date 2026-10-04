@@ -19,7 +19,29 @@
 
 当前不提供网站主动 HTTP / TLS 检测、任意 Shell、Compose 配置部署、镜像更新、配置 / 数据回滚、定时巡检或无人值守自动修复。完整范围见[项目状态与路线图](docs/PROJECT.md)。
 
-## 本地运行
+## Linux 一行部署
+
+在已有 `curl`、Bash 和 `sudo` 权限的 Linux 服务器终端执行。脚本默认安装到 `/opt/qiyun`，会检查 Git、Docker Engine 和 Compose v2；支持的 Ubuntu / Debian 可补装 Git，或在没有冲突容器运行时包的情况下从官方软件源安装缺失的 Docker。
+
+> 发布核验中：以下 `v0.1.0` 命令须在版本推送和公网下载核验完成后使用，当前不作为已发布安装入口。
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/Hello1999/qiyun/v0.1.0/install.sh | sudo env QIYUN_REF=v0.1.0 bash
+```
+
+安装时按提示输入 Ark API Key、管理员名称和密码；Key 与密码输入不会显示。可以跳过模型配置，先体验工作台。安装器保留配置和运行数据，同版本可重跑。
+
+在你自己的电脑建立 SSH 转发，然后浏览器打开 `http://127.0.0.1:4310`：
+
+```sh
+ssh -N -L 4310:127.0.0.1:4310 你的用户@服务器IP
+```
+
+这一步安装**控制端**。接入与管理服务器，还需单独配置 Linux Agent 和服务白名单；工作台不会自动取得宿主机权限。已有 HTTPS 反向代理也可接入。
+
+[完整部署说明](docs/DEPLOYMENT.md)包含访问、模型配置、无交互安装、升级与主机接入。源码仓库：[Hello1999/qiyun](https://github.com/Hello1999/qiyun)。
+
+## 本地开发
 
 需要 Node.js **24.15+** 与 pnpm **11.25.0**。在完整源码目录中：
 
@@ -35,13 +57,13 @@ Windows PowerShell 使用 `Copy-Item .env.example .env`。打开 `http://127.0.0
 
 构建、端口配置、模型接入、Linux 主机配对和权限白名单见[运行与接入](docs/RUNNING.md)。
 
-已经取得源码且安装 Docker Engine / Compose v2 的 Linux 主机，可在仓库根目录执行：
+已经取得完整源码且安装 Docker Engine / Compose v2 的 Linux 主机，也可从仓库根目录运行控制端安装器：
 
 ```sh
-sh deploy/install.sh
+bash deploy/install.sh
 ```
 
-该命令从本地源码构建并启动控制端。管理员初始化、CA 信任、Agent 安装和 helper 白名单仍按运行文档单独配置；当前没有公共下载 URL、签名发行包或自动升级流程。
+该命令从本地源码构建并启动控制端，并引导完成凭据与管理员初始化。Agent 安装、CA 信任与 helper 白名单另行配置。跨版本升级需要显式选择目标代码并运行更新，尚无无人值守自动升级或签名发行包。
 
 ## 当前验证范围
 
@@ -60,6 +82,7 @@ sh deploy/install.sh
 
 | 文档 | 内容 |
 | --- | --- |
+| [Linux 部署](docs/DEPLOYMENT.md) | 一行安装、SSH / HTTPS 访问、配置、数据与升级 |
 | [运行与接入](docs/RUNNING.md) | 开发启动、源码部署、模型配置、配对、验证命令 |
 | [项目状态与路线图](docs/PROJECT.md) | 已实现能力、未实现范围、后续验收门槛 |
 | [技术架构](docs/ARCHITECTURE.md) | 控制端、Agent、helper、执行与恢复边界 |
@@ -68,4 +91,4 @@ sh deploy/install.sh
 | [Agent 说明](agent/README.md) | Linux 配置、信任、白名单、执行收据 |
 | [工程协作规范](AGENTS.md) | 研发与交付约束 |
 
-代码使用本地 Git 管理；远程仓库和发行地址尚未配置。真实凭据、运行数据、私钥和客户日志不进入源码仓库。
+公开源码仓库为 [Hello1999/qiyun](https://github.com/Hello1999/qiyun)。真实凭据、运行数据、私钥和客户日志不进入源码仓库。

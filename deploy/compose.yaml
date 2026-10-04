@@ -1,13 +1,14 @@
-name: qiyun
+name: ${QIYUN_PROJECT_NAME:-qiyun}
 services:
   control:
+    image: ${QIYUN_CONTROL_IMAGE:-qiyun-control:local}
     build:
       context: ..
       dockerfile: deploy/Dockerfile
     restart: unless-stopped
     ports:
       - "127.0.0.1:${QIYUN_PORT:-4310}:4310"
-      - "${QIYUN_AGENT_PORT:-4311}:4311"
+      - "${QIYUN_AGENT_BIND:-127.0.0.1}:${QIYUN_AGENT_PORT:-4311}:4311"
     environment:
       QIYUN_AGENT_URL: ${QIYUN_AGENT_URL:-https://localhost:${QIYUN_AGENT_PORT:-4311}}
       QIYUN_AGENT_HOSTNAMES: ${QIYUN_AGENT_HOSTNAMES:-localhost}
@@ -15,9 +16,13 @@ services:
       QIYUN_DEMO: ${QIYUN_DEMO:-true}
       ARK_BASE_URL: https://ark.cn-beijing.volces.com/api/coding/v3
       ARK_MODEL: deepseek-v4.1-flash
-      ARK_API_KEY: ${ARK_API_KEY:-}
+      ARK_API_KEY_FILE: /run/qiyun-secrets/ark.key
     volumes:
       - control-data:/data
+      - type: bind
+        source: ${QIYUN_SECRET_DIR:-../.local/control-install/secrets}/ark.key
+        target: /run/qiyun-secrets/ark.key
+        read_only: true
     security_opt:
       - no-new-privileges:true
     cap_drop:
