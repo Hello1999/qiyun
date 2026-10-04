@@ -47,6 +47,7 @@ jobs:
         with:
           name: deployment-evidence
           path: .local/qiyun-fixture-*/
+          include-hidden-files: true
           retention-days: 7
   agent:
     runs-on: ubuntu-24.04

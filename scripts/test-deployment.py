@@ -160,3 +160,6 @@ finally:
     assert root.resolve().parent == Path('/opt') and root.name.startswith('qiyun-fixture-')
     shutil.rmtree(root)
     print('Evidence: ' + str(logs), flush=True)
+    if evidence.get('passed'):
+        check(evidence.get('cleanup_exit') == 0 and evidence.get('image_cleanup_exit') == 0,
+              'fixture containers, volumes, and image were cleaned up')
