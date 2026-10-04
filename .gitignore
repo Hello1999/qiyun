@@ -1,0 +1,41 @@
+# Credentials and machine-local settings
+.env
+.env.*
+!.env.example
+!.env.*.example
+secrets/
+credentials/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Runtime data, private configuration repositories, logs and backups
+.local/
+data/
+runtime/
+backups/
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.log
+
+# Build and dependency output
+node_modules/
+dist/
+build/
+coverage/
+.turbo/
+.cache/
+bin/
+tmp/
+playwright-report/
+test-results/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
