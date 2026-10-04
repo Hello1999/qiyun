@@ -32,6 +32,22 @@ jobs:
       - run: pnpm run typecheck
       - run: pnpm test
       - run: pnpm run build
+  deployment:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'Hello1999/qiyun'
+    needs: [installer, web-control, agent]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install public source, initialize through a terminal, and verify repeat installation
+        run: sudo env QIYUN_TEST_PUBLIC_INSTALL=1 python3 scripts/test-deployment.py "$GITHUB_SHA" interactive
+      - name: Retain isolated installation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-evidence
+          path: .local/qiyun-fixture-*/
+          retention-days: 7
   agent:
     runs-on: ubuntu-24.04
     steps:

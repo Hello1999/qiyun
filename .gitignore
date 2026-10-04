@@ -25,6 +25,8 @@ backups/
 
 # Build and dependency output
 node_modules/
+__pycache__/
+*.pyc
 node_modules.interrupted-*/
 dist/
 build/
